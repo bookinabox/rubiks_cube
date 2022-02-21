@@ -15,7 +15,7 @@ export class Project extends Scene {
 
         this.materials = {
             cubelet_mat: new Material(new Texture_Cube(), {
-                ambient: 1.0, color: hex_color("#000000")
+                ambient: 1.0, color: hex_color("#FF0000")
             }),
         }
 
@@ -65,11 +65,13 @@ class Texture_Cube extends defs.Phong_Shader {
     vertex_glsl_code() {
         return this.shared_glsl_code() + `
             varying vec2 f_tex_coord;
+            varying vec3 f_position;
+
             attribute vec3 position, normal;
 
             // Position is expressed in object coordinates.
             attribute vec2 texture_coord;
-            
+
             uniform mat4 model_transform;
             uniform mat4 projection_camera_model_transform;
     
@@ -81,12 +83,15 @@ class Texture_Cube extends defs.Phong_Shader {
                 vertex_worldspace = ( model_transform * vec4( position, 1.0 ) ).xyz;
                 // Turn the per-vertex texture coordinate into an interpolated variable.
                 f_tex_coord = texture_coord;
+                f_position = position;
               } `;
     }
 
     fragment_glsl_code() {
         return this.shared_glsl_code() + `
-            varying vec2 f_tex_coord;    
+            varying vec2 f_tex_coord;
+            varying vec3 f_position;
+
             uniform sampler2D texture;
 
             void main(){
@@ -95,6 +100,7 @@ class Texture_Cube extends defs.Phong_Shader {
 
                 float u = f_tex_coord.x;
                 float v = f_tex_coord.y;
+
 
                 float dist_to_inner_edge = 0.95;
                 bool border = false;
@@ -113,8 +119,35 @@ class Texture_Cube extends defs.Phong_Shader {
                     gl_FragColor = vec4(0,0,0,1.0);
                     gl_FragColor.xyz += phong_model_lights( normalize( N), vertex_worldspace );
                 } else {
-                    gl_FragColor = vec4(u,v,0, 1.0);
-                    gl_FragColor.xyz += phong_model_lights( normalize( N + vec3(5.0,5.0,5.0)), vertex_worldspace );
+
+                    // Probably a better way to do this???
+                    vec3 color = vec3(1.0,1.0,1.0);
+
+                    if(f_position.x == -1.0) {
+                        color = vec3(0, 0, 1.0);
+                    }
+                    if(f_position.x == 1.0) {
+                        color = vec3(0, 1.0, 0);
+                    }
+
+
+                    if(f_position.y == -1.0) {
+                        color = vec3(1.0, 1.0, 0.0);
+                    }
+                    if(f_position.y == 1.0) {
+                        color = vec3(1.0, 1.0, 1.0);
+                    }
+
+
+                    if(f_position.z == -1.0) {
+                        color = vec3(0.7, 0.3, 0);
+                    }
+                    if(f_position.z == 1.0) {
+                        color = vec3(1.0, 0.0, 0.0);
+                    }
+
+
+                    gl_FragColor = vec4(color, shape_color.w * tex_color.w );
                 }
         } `;
     }
