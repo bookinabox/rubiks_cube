@@ -15,7 +15,7 @@ export class Project extends Scene {
 
         this.materials = {
             cubelet_mat: new Material(new Texture_Cube(), {
-                ambient: 1.0, color: hex_color("#FF0000")
+                ambient: 1.0, color: hex_color("#000000")
             }),
         }
 
@@ -148,6 +148,7 @@ class Texture_Cube extends defs.Phong_Shader {
 
 
                     gl_FragColor = vec4(color, shape_color.w * tex_color.w );
+                    gl_FragColor.xyz += phong_model_lights( normalize( N+vec3(1.0,1.0,1.0)), vertex_worldspace );
                 }
         } `;
     }
