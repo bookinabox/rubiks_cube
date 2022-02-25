@@ -36,8 +36,24 @@ export class Project extends Scene {
     }
 
     make_control_panel() {
-        this.key_triggered_button("Cube rotation", ["c"], () => this.rotate = !this.rotate)
+        this.key_triggered_button("Cube rotation", ["c"], () => this.rotate_side());
     }
+
+    
+    rotate_side() {
+        let side = 1
+        for(let index in this.cubelet_data) {
+            if(this.cubelet_data[index][0][3] == 2) {
+
+                //let translate_to_center = Mat4.translation(0, -this.cubelet_data[index][1][3], -this.cubelet_data[index][2][3]);
+                //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.rotation(Math.PI/2, 1, 0, 0));
+                //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+            }
+        }
+    }
+    
+
 
     display(context, program_state) {
         if (!context.scratchpad.controls) {
