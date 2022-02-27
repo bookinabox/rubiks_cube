@@ -1,5 +1,5 @@
 import {defs, tiny} from './examples/common.js';
-
+import {MousePicker} from './mouse-picker.js';
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
@@ -37,29 +37,56 @@ export class Project extends Scene {
 
     make_control_panel() {
         this.key_triggered_button("Cube rotation", ["c"], () => this.rotate_side());
+        this.key_triggered_button("Cube rotation", ["v"], () => this.rotate_top());
     }
 
     
     rotate_side() {
         let side = 1
         for(let index in this.cubelet_data) {
-            if(this.cubelet_data[index][0][3] == 2) {
-
-                //let translate_to_center = Mat4.translation(0, -this.cubelet_data[index][1][3], -this.cubelet_data[index][2][3]);
+            if(Math.abs(this.cubelet_data[index][0][3] -2) < 0.0001) {
+                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
+               
                 //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
                 this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.rotation(Math.PI/2, 1, 0, 0));
+                //this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
+            }
+        }
+    }
+
+     rotate_top() {
+        let side = 1
+        for(let index in this.cubelet_data) {
+            if(Math.abs(this.cubelet_data[index][1][3] - 2) < 0.0001) {
+                //let translate_to_center = Mat4.translation(0, -this.cubelet_data[index][1][3], -this.cubelet_data[index][2][3]);
+                //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.rotation(Math.PI/2, 0, 1, 0));
                 //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
             }
         }
     }
-    
+
+   
 
 
     display(context, program_state) {
         if (!context.scratchpad.controls) {
-            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            this.children.push(context.scratchpad.controls = new MousePicker(program_state));
             program_state.set_camera(Mat4.translation(0, 0, -8));
+            context.scratchpad.controls.update_view(program_state);
+
+            context.canvas.addEventListener("mousedown", e => {
+                    e.preventDefault()
+                    const coords = context.scratchpad.controls.get_mouse_ray(context.canvas);
+                    console.log(coords);
+                }
+            );
         }
+        
+
+
+
+
 
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, 1, 100);
