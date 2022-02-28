@@ -9,18 +9,14 @@ export class MousePicker extends defs.Movement_Controls{
         super();
         this.projection_matrix = program_state.projection_transform;
         this.view_matrix = program_state.camera_inverse;
+        this.frozen = false;
     }
 
     update_view(program_state) {
         this.view_matrix = program_state.camera_inverse;
     }
 
-    normalize_coordinates(x, y) {
-        return vec(2*x / this.width, -2*y / this.height);
-    }
-
     get_mouse_ray(canvas) {
-
         const mouse_position = (e, rect = canvas.getBoundingClientRect()) => {
             this.width = rect.width;
             this.height = rect.height;
@@ -32,33 +28,48 @@ export class MousePicker extends defs.Movement_Controls{
                 const coords = mouse_position(e);
                 this.mouse["from_center"] = vec(coords[0], coords[1]);
 
-                const x = this.mouse.from_center[0];
-                const y = this.mouse.from_center[1];
-                const normalized_coords  = this.normalize_coordinates(x, y);
-                this.currentRay = vec4(normalized_coords[0], normalized_coords[1], -1, 1);  
+                // Normalize+Homogenized Coordinates
+                this.currentRay = vec4(2*this.mouse.from_center[0] / this.width, -2*this.mouse.from_center[1] / this.height, -1, 1);  
                 // Convert to Eye to World coordinates
-                this.currentRay = this.persp_to_world(this.currentRay);
+                const eye_coords = Mat4.inverse(this.projection_matrix).times(this.currentRay);
+                this.currentRay =  vec(eye_coords[0], eye_coords[1], -1, 0);
+                const world_coords = Mat4.inverse(this.view_matrix).times(this.currentRay);
+                this.currentRay = vec(world_coords[0], world_coords[1], world_coords[2]);
         });
         return this.currentRay;
     }
 
-    persp_to_world(coords) {
-        let c = this.eye_to_world(this.persp_to_eye(coords));
-        return c;
+    freeze_camera() {
+        this.frozen = true;
     }
 
-    persp_to_eye(coords) {
-        const eye_coords = Mat4.inverse(this.projection_matrix).times(coords);
-        return vec(eye_coords[0], eye_coords[1], -1, 0);
+    unfreeze_camera() {
+        this.frozen = false;
     }
 
-    eye_to_world(coords) {
-        const world_coords = Mat4.inverse(this.view_matrix).times(coords);
-        return vec(world_coords[0], world_coords[1], world_coords[2]);
-    }
 
     display(context, graphics_state, dt = graphics_state.animation_delta_time / 1000) {
-        super.display(context, graphics_state, dt);
-    }
-    
+        // The whole process of acting upon controls begins here.
+        const m = this.speed_multiplier * this.meters_per_frame,
+            r = this.speed_multiplier * this.radians_per_frame;
+
+        if (this.will_take_over_graphics_state) {
+            this.reset(graphics_state);
+            this.will_take_over_graphics_state = false;
+        }
+
+        if (!this.mouse_enabled_canvases.has(context.canvas)) {
+            this.add_mouse_controls(context.canvas);
+            this.mouse_enabled_canvases.add(context.canvas)
+        }
+        // Move in first-person.  Scale the normal camera aiming speed by dt for smoothness:
+        this.first_person_flyaround(dt * r, dt * m);
+        // Modify this to not rotate when hitting cube.
+        if (this.mouse.anchor && !this.frozen)
+            this.third_person_arcball(dt * r);
+        // Log some values:
+        this.pos = this.inverse().times(vec4(0, 0, 0, 1));
+        this.z_axis = this.inverse().times(vec4(0, 0, 1, 0));
+    }    
+
 }

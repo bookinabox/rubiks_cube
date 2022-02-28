@@ -66,27 +66,26 @@ export class Project extends Scene {
         }
     }
 
-   
-
-
     display(context, program_state) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new MousePicker(program_state));
-            program_state.set_camera(Mat4.translation(0, 0, -8));
-            context.scratchpad.controls.update_view(program_state);
+            program_state.set_camera(Mat4.translation(0, 0, -25));
 
+            let coords = undefined;
             context.canvas.addEventListener("mousedown", e => {
                     e.preventDefault()
-                    const coords = context.scratchpad.controls.get_mouse_ray(context.canvas);
-                    console.log(coords);
+                    context.scratchpad.controls.update_view(program_state);
+                    coords = context.scratchpad.controls.get_mouse_ray(context.canvas);
+                }
+            );
+            context.canvas.addEventListener("mouseup", e => {
+                    e.preventDefault()
+                    coords = context.scratchpad.controls.get_mouse_ray(context.canvas);
+                    context.scratchpad.controls.unfreeze_camera();
                 }
             );
         }
         
-
-
-
-
 
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, 1, 100);
