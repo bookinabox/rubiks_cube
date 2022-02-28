@@ -72,7 +72,7 @@ export class Project extends Scene {
     display(context, program_state) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new MousePicker(program_state));
-            program_state.set_camera(Mat4.translation(0, 0, -8));
+            program_state.set_camera(Mat4.translation(0, 0, -25));
             context.scratchpad.controls.update_view(program_state);
 
             context.canvas.addEventListener("mousedown", e => {
