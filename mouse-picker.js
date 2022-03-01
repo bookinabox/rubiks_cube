@@ -29,12 +29,12 @@ export class MousePicker extends defs.Movement_Controls{
                 this.mouse["from_center"] = vec(coords[0], coords[1]);
 
                 // Normalize+Homogenized Coordinates
-                this.currentRay = vec4(2*this.mouse.from_center[0] / this.width, -2*this.mouse.from_center[1] / this.height, -1, 1);  
+                this.currentRay = vec4(1*this.mouse.from_center[0] / this.width, -1*this.mouse.from_center[1] / this.width, -1, 1);  
                 // Convert to Eye to World coordinates
                 const eye_coords = Mat4.inverse(this.projection_matrix).times(this.currentRay);
-                this.currentRay =  vec(eye_coords[0], eye_coords[1], -1, 0);
+                this.currentRay =  vec(eye_coords[0], eye_coords[1], 1, 0);
                 const world_coords = Mat4.inverse(this.view_matrix).times(this.currentRay);
-                this.currentRay = vec(world_coords[0], world_coords[1], world_coords[2]);
+                this.currentRay = vec(world_coords[0], world_coords[1], world_coords[2]).normalized();
         });
         return this.currentRay;
     }
@@ -47,6 +47,11 @@ export class MousePicker extends defs.Movement_Controls{
         this.frozen = false;
     }
 
+    world_position() {
+        let location = this.view_matrix.times(this.pos);
+        location[2] = location[2] + 25;
+        return location;
+    }
 
     display(context, graphics_state, dt = graphics_state.animation_delta_time / 1000) {
         // The whole process of acting upon controls begins here.

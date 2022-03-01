@@ -66,22 +66,148 @@ export class Project extends Scene {
         }
     }
 
+    check_closest_face(position, ray) {
+        const cube_radius = 3;
+
+
+        // Find distance from cardinal planes
+        let front_dist = (-cube_radius - position[2]) / ray[2];
+        let back_dist = (cube_radius - position[2]) / ray[2];
+
+        let right_dist = (cube_radius - position[0]) / ray[0];
+        let left_dist = (-cube_radius - position[0]) / ray[0];
+
+        let top_dist = (cube_radius - position[1]) / ray[1];
+        let bottom_dist = (-cube_radius - position[1]) / ray[1];
+
+        // Do not take into account intersections with planes that are off the cube
+        
+        const front_coord = ray.times(front_dist).plus(position);
+        const back_coord = ray.times(back_dist).plus(position);
+        const right_coord = ray.times(right_dist).plus(position);
+        const left_coord = ray.times(left_dist).plus(position);
+        const top_coord = ray.times(top_dist).plus(position);
+        const bottom_coord = ray.times(bottom_dist).plus(position);
+
+        
+        console.log("front_dist " + front_dist);
+        console.log("back_dist " + back_dist);
+        console.log("right_dist " + right_dist);
+        console.log("left_dist " + left_dist);
+        console.log("top_dist " + top_dist);
+        console.log("bottom_dist " + bottom_dist);
+        console.log("ray " + ray);
+        console.log("position " + position);
+        console.log();
+
+        console.log("front")
+        console.log(front_coord);
+        console.log("back")
+        console.log(back_coord);
+        console.log("right")
+        console.log(right_coord);
+        console.log("left")
+        console.log(left_coord);
+        console.log("top")
+        console.log(top_coord);
+        console.log("bottom")
+        console.log(bottom_coord);
+        
+
+        const threshold = 7;
+        if(Math.abs(front_coord[0]) > threshold || Math.abs(front_coord[1]) > threshold || Math.abs(front_coord[2]) > threshold) {
+            front_dist = Infinity;
+        }
+        if(Math.abs(back_coord[0]) > threshold || Math.abs(back_coord[1]) > threshold || Math.abs(back_coord[2]) > threshold) {
+            back_dist = Infinity;
+        }
+        if(Math.abs(right_coord[0]) > threshold || Math.abs(right_coord[1]) > threshold || Math.abs(right_coord[2]) > threshold) {
+            right_dist = Infinity;
+        }
+        if(Math.abs(left_coord[0]) > threshold || Math.abs(left_coord[1]) > threshold || Math.abs(left_coord[2]) > threshold) {
+            left_dist = Infinity;
+        }
+        if(Math.abs(top_coord[0]) > threshold || Math.abs(top_coord[1]) > threshold || Math.abs(top_coord[2]) > threshold) {
+            top_dist = Infinity;
+        }
+        if(Math.abs(bottom_coord[0]) > threshold || Math.abs(bottom_coord[1]) > threshold || Math.abs(bottom_coord[2]) > threshold) {
+            bottom_dist = Infinity;
+        }
+        
+        // Find minimum
+
+        var sides = [{
+            name: "front",
+            val: front_dist
+        },
+        {
+            name: "back",
+            val: back_dist
+        },
+        {
+            name: "left",
+            val: left_dist
+        },
+        {
+            name: "right",
+            val: right_dist
+        },
+        {
+            name: "top",
+            val: top_dist
+        },
+        {
+            name: "bottom",
+            val: bottom_dist
+        },
+    ]
+
+    let min = sides.reduce((obj1, obj2) => {
+        return (Math.abs(obj1.val) < Math.abs(obj2.val)) ? obj1: obj2;
+    });
+
+    if (min.val != Infinity)
+        console.log(min);
+    /*
+        console.log(position);
+        console.log("front")
+        console.log(front_dist);
+        console.log("back")
+        console.log(back_dist);
+        console.log("right")
+        console.log(right_dist);
+        console.log("left")
+        console.log(left_dist);
+        console.log("top")
+        console.log(top_dist);
+        console.log("bottom")
+        console.log(bottom_dist);
+    */
+    }
+
+
+
+
     display(context, program_state) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new MousePicker(program_state));
             program_state.set_camera(Mat4.translation(0, 0, -25));
 
+            let ray = undefined;
             let coords = undefined;
             context.canvas.addEventListener("mousedown", e => {
                     e.preventDefault()
                     context.scratchpad.controls.update_view(program_state);
-                    coords = context.scratchpad.controls.get_mouse_ray(context.canvas);
+                    ray = context.scratchpad.controls.get_mouse_ray(context.canvas);
+                    coords = context.scratchpad.controls.world_position();
+                    this.check_closest_face(coords, ray);
                 }
             );
             context.canvas.addEventListener("mouseup", e => {
                     e.preventDefault()
-                    coords = context.scratchpad.controls.get_mouse_ray(context.canvas);
+                    ray  = context.scratchpad.controls.get_mouse_ray(context.canvas);
                     context.scratchpad.controls.unfreeze_camera();
+                    coords = context.scratchpad.controls.world_position();
                 }
             );
         }
