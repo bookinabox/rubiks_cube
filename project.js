@@ -69,7 +69,6 @@ export class Project extends Scene {
     check_closest_face(position, ray) {
         const cube_radius = 3;
 
-
         // Find distance from cardinal planes
         let front_dist = (-cube_radius - position[2]) / ray[2];
         let back_dist = (cube_radius - position[2]) / ray[2];
@@ -112,7 +111,7 @@ export class Project extends Scene {
         console.log(top_coord);
         console.log("bottom")
         console.log(bottom_coord);
-        
+             
 
         const threshold = 7;
         if(Math.abs(front_coord[0]) > threshold || Math.abs(front_coord[1]) > threshold || Math.abs(front_coord[2]) > threshold) {
@@ -190,8 +189,12 @@ export class Project extends Scene {
 
     display(context, program_state) {
         if (!context.scratchpad.controls) {
-            this.children.push(context.scratchpad.controls = new MousePicker(program_state));
             program_state.set_camera(Mat4.translation(0, 0, -25));
+            program_state.projection_transform = Mat4.perspective(
+                Math.PI / 4, context.width / context.height, 1, 100);
+
+            this.children.push(context.scratchpad.controls = new MousePicker(program_state));
+
 
             let ray = undefined;
             let coords = undefined;
@@ -213,8 +216,7 @@ export class Project extends Scene {
         }
         
 
-        program_state.projection_transform = Mat4.perspective(
-            Math.PI / 4, context.width / context.height, 1, 100);
+        
 
         const light_position = vec4(10, 10, 10, 1);
         program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
