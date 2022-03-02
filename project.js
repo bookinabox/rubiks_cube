@@ -70,17 +70,16 @@ export class Project extends Scene {
         const cube_radius = 3;
 
         // Find distance from cardinal planes
-        let front_dist = (-cube_radius - position[2]) / ray[2];
-        let back_dist = (cube_radius - position[2]) / ray[2];
+        let front_dist = Math.abs((position[2] + cube_radius) / ray[2]);
+        let back_dist = Math.abs((position[2] - cube_radius) / ray[2]);
 
-        let right_dist = (cube_radius - position[0]) / ray[0];
-        let left_dist = (-cube_radius - position[0]) / ray[0];
+        let right_dist = -Math.abs((position[0] - cube_radius) / ray[0]);
+        let left_dist = -Math.abs((position[0] + cube_radius) / ray[0]);
 
-        let top_dist = (cube_radius - position[1]) / ray[1];
-        let bottom_dist = (-cube_radius - position[1]) / ray[1];
+        let top_dist = -Math.abs((position[1] - cube_radius) / ray[1]);
+        let bottom_dist = Math.abs((position[1] + cube_radius) / ray[1]);
 
         // Do not take into account intersections with planes that are off the cube
-        
         const front_coord = ray.times(front_dist).plus(position);
         const back_coord = ray.times(back_dist).plus(position);
         const right_coord = ray.times(right_dist).plus(position);
@@ -113,7 +112,7 @@ export class Project extends Scene {
         console.log(bottom_coord);
              
 
-        const threshold = 7;
+        const threshold = 3.2;
         if(Math.abs(front_coord[0]) > threshold || Math.abs(front_coord[1]) > threshold || Math.abs(front_coord[2]) > threshold) {
             front_dist = Infinity;
         }
@@ -165,8 +164,12 @@ export class Project extends Scene {
         return (Math.abs(obj1.val) < Math.abs(obj2.val)) ? obj1: obj2;
     });
 
-    if (min.val != Infinity)
+    if (min.val != Infinity) {
         console.log(min);
+        return true;
+    }
+
+    return false;
     /*
         console.log(position);
         console.log("front")
@@ -195,7 +198,6 @@ export class Project extends Scene {
 
             this.children.push(context.scratchpad.controls = new MousePicker(program_state));
 
-
             let ray = undefined;
             let coords = undefined;
             context.canvas.addEventListener("mousedown", e => {
@@ -203,7 +205,8 @@ export class Project extends Scene {
                     context.scratchpad.controls.update_view(program_state);
                     ray = context.scratchpad.controls.get_mouse_ray(context.canvas);
                     coords = context.scratchpad.controls.world_position();
-                    this.check_closest_face(coords, ray);
+                    if(ray != undefined)
+                        this.check_closest_face(coords, ray);
                 }
             );
             context.canvas.addEventListener("mouseup", e => {

@@ -872,13 +872,13 @@ const Movement_Controls = defs.Movement_Controls =
             // make_control_panel(): Sets up a panel of interactive HTML elements, including
             // buttons with key bindings for affecting this scene, and live info readouts.
             this.control_panel.innerHTML += "Click and drag the scene to spin your viewpoint around it.<br>";
-            this.live_string(box => box.textContent = "- Position: " + this.pos[0].toFixed(2) + ", " + this.pos[1].toFixed(2)
-                + ", " + this.pos[2].toFixed(2));
-            this.new_line();
+            //this.live_string(box => box.textContent = "- Position: " + this.pos[0].toFixed(2) + ", " + this.pos[1].toFixed(2)
+            //    + ", " + this.pos[2].toFixed(2));
+            //this.new_line();
             // The facing directions are surprisingly affected by the left hand rule:
             this.live_string(box => box.textContent = "- Facing: " + ((this.z_axis[0] > 0 ? "West " : "East ")
                 + (this.z_axis[1] > 0 ? "Down " : "Up ") + (this.z_axis[2] > 0 ? "North" : "South")));
-            //this.new_line();
+            this.new_line();
             //this.new_line();
 
             //this.key_triggered_button("Up", [" "], () => this.thrust[1] = -1, undefined, () => this.thrust[1] = 0);
@@ -891,7 +891,7 @@ const Movement_Controls = defs.Movement_Controls =
             //this.key_triggered_button("Down", ["z"], () => this.thrust[1] = 1, undefined, () => this.thrust[1] = 0);
 
             //const speed_controls = this.control_panel.appendChild(document.createElement("span"));
-            speed_controls.style.margin = "30px";
+            //speed_controls.style.margin = "30px";
             //this.key_triggered_button("-", ["o"], () =>
             //    this.speed_multiplier /= 1.2, undefined, undefined, undefined, speed_controls);
             //this.live_string(box => {
@@ -903,25 +903,25 @@ const Movement_Controls = defs.Movement_Controls =
             this.key_triggered_button("Roll left", [","], () => this.roll = 1, undefined, () => this.roll = 0);
             this.key_triggered_button("Roll right", ["."], () => this.roll = -1, undefined, () => this.roll = 0);
             this.new_line();
-            this.key_triggered_button("(Un)freeze mouse look around", ["f"], () => this.look_around_locked ^= 1, "#8B8885");
-            this.new_line();
-            this.key_triggered_button("Go to world origin", ["r"], () => {
-                this.matrix().set_identity(4, 4);
-                this.inverse().set_identity(4, 4)
-            }, "#8B8885");
-            this.new_line();
+            //this.key_triggered_button("(Un)freeze mouse look around", ["f"], () => this.look_around_locked ^= 1, "#8B8885");
+            //this.new_line();
+            //this.key_triggered_button("Go to world origin", ["r"], () => {
+            //    this.matrix().set_identity(4, 4);
+            //    this.inverse().set_identity(4, 4)
+            //}, "#8B8885");
+            //this.new_line();
 
             this.key_triggered_button("Look at origin from front", ["1"], () => {
-                this.inverse().set(Mat4.look_at(vec3(0, 0, 10), vec3(0, 0, 0), vec3(0, 1, 0)));
+                this.inverse().set(Mat4.look_at(vec3(0, 0, 25), vec3(0, 0, 0), vec3(0, 1, 0)));
                 this.matrix().set(Mat4.inverse(this.inverse()));
             }, "#8B8885");
             this.new_line();
             this.key_triggered_button("from right", ["2"], () => {
-                this.inverse().set(Mat4.look_at(vec3(10, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0)));
+                this.inverse().set(Mat4.look_at(vec3(25, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0)));
                 this.matrix().set(Mat4.inverse(this.inverse()));
             }, "#8B8885");
             this.key_triggered_button("from rear", ["3"], () => {
-                this.inverse().set(Mat4.look_at(vec3(0, 0, -10), vec3(0, 0, 0), vec3(0, 1, 0)));
+                this.inverse().set(Mat4.look_at(vec3(0, 0, -25), vec3(0, 0, 0), vec3(0, 1, 0)));
                 this.matrix().set(Mat4.inverse(this.inverse()));
             }, "#8B8885");
             this.key_triggered_button("from left", ["4"], () => {
@@ -929,11 +929,11 @@ const Movement_Controls = defs.Movement_Controls =
                 this.matrix().set(Mat4.inverse(this.inverse()));
             }, "#8B8885");
             this.new_line();
-            this.key_triggered_button("Attach to global camera", ["Shift", "R"],
-                () => {
-                    this.will_take_over_graphics_state = true
-                }, "#8B8885");
-            this.new_line();
+            //this.key_triggered_button("Attach to global camera", ["Shift", "R"],
+            //    () => {
+            //        this.will_take_over_graphics_state = true
+            //    }, "#8B8885");
+            //this.new_line();
         }
 
         first_person_flyaround(radians_per_frame, meters_per_frame, leeway = 70) {

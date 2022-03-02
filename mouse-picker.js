@@ -29,12 +29,14 @@ export class MousePicker extends defs.Movement_Controls{
                 this.mouse["from_center"] = vec(coords[0], coords[1]);
 
                 // Normalize+Homogenized Coordinates
-                this.currentRay = vec4(1*this.mouse.from_center[0] / this.width, -1*this.mouse.from_center[1] / this.width, -1, 1);  
+                this.currentRay = vec4(2*this.mouse.from_center[0] / this.width, -2*this.mouse.from_center[1] / this.height, -1, 1);  
                 // Convert to Eye to World coordinates
                 const eye_coords = Mat4.inverse(this.projection_matrix).times(this.currentRay);
-                this.currentRay =  vec(eye_coords[0], eye_coords[1], 1, 0);
+                this.currentRay =  vec(eye_coords[0], eye_coords[1], -1, 0);
                 const world_coords = Mat4.inverse(this.view_matrix).times(this.currentRay);
-                this.currentRay = vec(world_coords[0], world_coords[1], world_coords[2]).normalized();
+                // Convert back to right hand
+                const mirrored_coords = Mat4.scale(1, 1, -1).times(world_coords);
+                this.currentRay = vec(mirrored_coords[0], mirrored_coords[1], mirrored_coords[2]).normalized();
         });
         return this.currentRay;
     }
