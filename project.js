@@ -112,7 +112,7 @@ export class Project extends Scene {
         console.log(bottom_coord);
              
 
-        const threshold = 3.2;
+        const threshold = 3.0;
         if(Math.abs(front_coord[0]) > threshold || Math.abs(front_coord[1]) > threshold || Math.abs(front_coord[2]) > threshold) {
             front_dist = Infinity;
         }
@@ -136,40 +136,67 @@ export class Project extends Scene {
 
         var sides = [{
             name: "front",
-            val: front_dist
+            dist: front_dist,
+            coord: front_coord
         },
         {
             name: "back",
-            val: back_dist
+            dist: back_dist,
+            coord: back_coord
         },
         {
             name: "left",
-            val: left_dist
+            dist: left_dist,
+            coord: left_coord
         },
         {
             name: "right",
-            val: right_dist
+            dist: right_dist,
+            coord: right_coord
         },
         {
             name: "top",
-            val: top_dist
+            dist: top_dist,
+            coord: top_coord
         },
         {
             name: "bottom",
-            val: bottom_dist
+            dist: bottom_dist,
+            coord: bottom_coord
         },
     ]
 
     let min = sides.reduce((obj1, obj2) => {
-        return (Math.abs(obj1.val) < Math.abs(obj2.val)) ? obj1: obj2;
+        return (Math.abs(obj1.dist) < Math.abs(obj2.dist)) ? obj1: obj2;
     });
 
-    if (min.val != Infinity) {
-        console.log(min);
-        return true;
+
+    // Determine which side(s) (up to two, cannot decide which until mouse lets go)
+    let coordinates = min.coord;
+
+    if (coordinates[0] < -1) {
+        console.log("left");
+    } else if (coordinates[0] < 1) {
+        console.log("center");
+    } else {
+        console.log("right");
     }
 
-    return false;
+    if (coordinates[1] < -1) {
+        console.log("bottom");
+    } else if (coordinates[1] < 1) {
+        console.log("center");
+    } else {
+        console.log("top");
+    }
+
+    console.log(min);
+
+    if(Math.abs(coordinates[0]) < 3.1 && Math.abs(coordinates[1]) < 3.1 && Math.abs(coordinates[2])< 3.1) {
+        return "frozen";
+    }
+
+    return min.val;
     /*
         console.log(position);
         console.log("front")
@@ -205,14 +232,19 @@ export class Project extends Scene {
                     context.scratchpad.controls.update_view(program_state);
                     ray = context.scratchpad.controls.get_mouse_ray(context.canvas);
                     coords = context.scratchpad.controls.world_position();
+                    let faces = undefined;
                     if(ray != undefined)
-                        this.check_closest_face(coords, ray);
+                        faces = this.check_closest_face(coords, ray);
+                    
+                    if (faces === "frozen") {
+                        context.scratchpad.controls.freeze_camera();
+                    }
                 }
             );
             context.canvas.addEventListener("mouseup", e => {
+                    context.scratchpad.controls.unfreeze_camera();
                     e.preventDefault()
                     ray  = context.scratchpad.controls.get_mouse_ray(context.canvas);
-                    context.scratchpad.controls.unfreeze_camera();
                     coords = context.scratchpad.controls.world_position();
                 }
             );
