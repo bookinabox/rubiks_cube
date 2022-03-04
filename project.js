@@ -1,4 +1,5 @@
 import {defs, tiny} from './examples/common.js';
+import { Main_Scene } from './main-scene.js';
 import {MousePicker} from './mouse-picker.js';
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
@@ -68,6 +69,9 @@ export class Project extends Scene {
 
     check_closest_face(position, ray) {
         const cube_radius = 3;
+
+        let up_vector = Mat4.rotation(Math.PI/2, -1, 0, 0).times(ray);
+        console.log("Up Vector" + up_vector);
 
         // Find distance from cardinal planes
         let front_dist = Math.abs((position[2] + cube_radius) / ray[2]);
@@ -173,7 +177,7 @@ export class Project extends Scene {
 
     // Determine which side(s) (up to two, cannot decide which until mouse lets go)
     let coordinates = min.coord;
-
+    console.log(min.name);
     if (coordinates[0] < -1) {
         console.log("left");
     } else if (coordinates[0] < 1) {
@@ -190,13 +194,21 @@ export class Project extends Scene {
         console.log("top");
     }
 
+    if (coordinates[2] < -1) {
+        console.log("front");
+    } else if (coordinates[2] < 1) {
+        console.log("center");
+    } else {
+        console.log("back");
+    }
+
     console.log(min);
 
     if(Math.abs(coordinates[0]) < 3.1 && Math.abs(coordinates[1]) < 3.1 && Math.abs(coordinates[2])< 3.1) {
-        return "frozen";
+        return min;
     }
 
-    return min.val;
+    return undefined;
     /*
         console.log(position);
         console.log("front")
@@ -235,7 +247,14 @@ export class Project extends Scene {
                     let faces = undefined;
                     if(ray != undefined)
                         faces = this.check_closest_face(coords, ray);
-                    
+                        console.log(faces);
+                        if(faces.coord[0] > 1) {
+                            
+                            this.rotate_side()
+                        }
+
+
+
                     if (faces === "frozen") {
                         context.scratchpad.controls.freeze_camera();
                     }
