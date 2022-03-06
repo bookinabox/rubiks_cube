@@ -91,7 +91,7 @@ export class Project extends Scene {
                         }
                     }
 
-                    if (faces === "frozen") {
+                    if (faces != undefined) {
                         context.scratchpad.controls.freeze_camera();
                     }
                 }

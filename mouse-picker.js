@@ -67,14 +67,19 @@ export class MousePicker extends defs.Movement_Controls{
         const cube_radius = 3;
 
         // Find distance from cardinal planes
-        let front_dist = Math.abs((position[2] + cube_radius) / ray[2]);
-        let back_dist = Math.abs((position[2] - cube_radius) / ray[2]);
+        const z_axis = this.z_axis[0];
+        const z_orient = z_axis != 0 ? this.z_axis[0]/Math.abs(this.z_axis[0]) : 1;
+        const x_axis = this.z_axis[2];
+        const x_orient = x_axis != 0 ? this.z_axis[2]/Math.abs(this.z_axis[2]) : 1;
+        const y_axis = this.z_axis[1];
+        const y_orient = y_axis != 0 ? y_orient = this.z_axis[1]/Math.abs(this.z_axis[1]) : 1;
 
-        let right_dist = -Math.abs((position[0] - cube_radius) / ray[0]);
-        let left_dist = -Math.abs((position[0] + cube_radius) / ray[0]);
-
-        let top_dist = -Math.abs((position[1] - cube_radius) / ray[1]);
-        let bottom_dist = Math.abs((position[1] + cube_radius) / ray[1]);
+        let front_dist = Math.abs((position[2] + cube_radius) / ray[2]) * -z_orient;
+        let back_dist = Math.abs((position[2] - cube_radius) / ray[2]) * -z_orient;
+        let right_dist = Math.abs((position[0] - cube_radius) / ray[0]) * -x_orient;
+        let left_dist = Math.abs((position[0] + cube_radius) / ray[0]) * -x_orient;
+        let top_dist = Math.abs((position[1] - cube_radius) / ray[1]) * -y_orient;
+        let bottom_dist = Math.abs((position[1] + cube_radius) / ray[1]) * -y_orient;
 
         // Do not take into account intersections with planes that are off the cube
         const front_coord = ray.times(front_dist).plus(position);
@@ -150,6 +155,11 @@ export class MousePicker extends defs.Movement_Controls{
             dist: bottom_dist,
             coord: bottom_coord
         },
+        {
+            name: "none",
+            dist: Infinity,
+            coord: undefined
+        }
     ]
 
     let min = sides.reduce((obj1, obj2) => {
@@ -160,35 +170,40 @@ export class MousePicker extends defs.Movement_Controls{
     // Determine which side(s) (up to two, cannot decide which until mouse lets go)
     let coordinates = min.coord;
     console.log(min.name);
-    if (coordinates[0] < -1) {
-        console.log("left");
-    } else if (coordinates[0] < 1) {
-        console.log("center");
-    } else {
-        console.log("right");
-    }
 
-    if (coordinates[1] < -1) {
-        console.log("bottom");
-    } else if (coordinates[1] < 1) {
-        console.log("center");
-    } else {
-        console.log("top");
-    }
+    if(min.coord != undefined){
+        if (coordinates[0] < -1) {
+            console.log("left");
+        } else if (coordinates[0] < 1) {
+            console.log("center");
+        } else {
+            console.log("right");
+        }
 
-    if (coordinates[2] < -1) {
-        console.log("front");
-    } else if (coordinates[2] < 1) {
-        console.log("center");
-    } else {
-        console.log("back");
-    }
+        if (coordinates[1] < -1) {
+            console.log("bottom");
+        } else if (coordinates[1] < 1) {
+            console.log("center");
+        } else {
+            console.log("top");
+        }
+     
+        if (coordinates[2] < -1) {
+            console.log("front");
+        } else if (coordinates[2] < 1) {
+            console.log("center");
+        } else {
+            console.log("back");
+        }
+        console.log(min);
 
-    console.log(min);
-
-    if(Math.abs(coordinates[0]) < 3.1 && Math.abs(coordinates[1]) < 3.1 && Math.abs(coordinates[2])< 3.1) {
-        return min;
+        if(Math.abs(coordinates[0]) < 3.1 && Math.abs(coordinates[1]) < 3.1 && Math.abs(coordinates[2])< 3.1) {
+            return min;
     }
+    }
+     
+
+
 
     return undefined;
     }
