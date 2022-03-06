@@ -22,28 +22,17 @@ export class MousePicker extends defs.Movement_Controls{
         this.context = context;
     }
 
-    get_mouse_ray(canvas) {
-        const mouse_position = (e, rect = canvas.getBoundingClientRect()) => {
-            this.width = rect.width;
-            this.height = rect.height;
-            return vec(e.clientX - (rect.left + rect.right) / 2, e.clientY - (rect.bottom + rect.top) / 2);
-        }
-
-        canvas.addEventListener("mousemove", e => {
-                e.preventDefault();
-                const coords = mouse_position(e);
-                this.mouse["from_center"] = vec(coords[0], coords[1]);
-
-                // Normalize+Homogenized Coordinates
-                this.ray = vec4(2*this.mouse.from_center[0] / this.width, -2*this.mouse.from_center[1] / this.height, -1, 1);  
-                // Convert to Eye to World coordinates
-                const eye_coords = Mat4.inverse(this.projection_matrix).times(this.ray);
-                this.ray =  vec(eye_coords[0], eye_coords[1], -1, 0);
-                const world_coords = Mat4.inverse(this.view_matrix).times(this.ray);
-                // Convert back to right hand
-                const mirrored_coords = Mat4.scale(1, 1, -1).times(world_coords);
-                this.ray = vec(mirrored_coords[0], mirrored_coords[1], mirrored_coords[2]).normalized();
-        });
+    get_mouse_ray(coords, width, height) {
+        // Normalize+Homogenized Coordinates
+        this.ray = vec4(2*coords[0] / width, -2*coords[1] / height, -1, 1);
+        // Convert to Eye
+        this.ray = Mat4.inverse(this.projection_matrix).times(this.ray);
+        this.ray = vec(this.ray[0], this.ray[1], -1, 0);
+        // Convert to World
+        this.ray = Mat4.inverse(this.view_matrix).times(this.ray);
+                // Convert from left to right handed coordinate
+        this.ray = Mat4.scale(1, 1, -1).times(this.ray);
+        this.ray = vec(this.ray[0], this.ray[1], this.ray[2]).normalized();
     }
 
     freeze_camera() {
@@ -60,8 +49,8 @@ export class MousePicker extends defs.Movement_Controls{
         return location;
     }
 
-    check_closest_face(position) {
-        this.get_mouse_ray(this.context.canvas);
+    check_closest_face(mouse_coords, position, width, height) {
+        this.get_mouse_ray(mouse_coords, width, height);
         let ray = this.ray;
 
         const cube_radius = 3;
@@ -81,6 +70,7 @@ export class MousePicker extends defs.Movement_Controls{
         const top_coord = ray.times(top_dist).plus(position)[1] === 3 ? ray.times(top_dist).plus(position) : ray.times(-top_dist).plus(position);;
         const bottom_coord = ray.times(bottom_dist).plus(position)[1] === -3 ? ray.times(bottom_dist).plus(position) : ray.times(-bottom_dist).plus(position);
 
+        
         console.log("front_dist " + front_dist);
         console.log("back_dist " + back_dist);
         console.log("right_dist " + right_dist);
@@ -105,6 +95,7 @@ export class MousePicker extends defs.Movement_Controls{
         console.log(top_coord);
         console.log("bottom")
         console.log(bottom_coord);
+        
 
         const threshold = 3.0;
         if(Math.abs(front_coord[0]) > threshold || Math.abs(front_coord[1]) > threshold || Math.abs(front_coord[2]) > threshold) {

@@ -75,15 +75,21 @@ export class Project extends Scene {
 
             this.children.push(context.scratchpad.controls = new MousePicker(program_state));
 
-            let ray = undefined;
-            let coords = undefined;
             context.canvas.addEventListener("mousedown", e => {
                     e.preventDefault()
+                    context.scratchpad.controls.unfreeze_camera();
+                    const mouse_position = (e, rect = context.canvas.getBoundingClientRect()) => {
+                        this.width = rect.width;
+                        this.height = rect.height;
+                        return vec(e.clientX - (rect.left + rect.right) / 2, e.clientY - (rect.bottom + rect.top) / 2);
+                    }
+
                     context.scratchpad.controls.update_view(program_state);
                     context.scratchpad.controls.update_context(context)
-                    coords = context.scratchpad.controls.world_position();
-                    let faces = undefined;
-                    faces = context.scratchpad.controls.check_closest_face(coords, ray);
+                    const coords = context.scratchpad.controls.world_position();
+                    const m_coords = mouse_position(e);
+                    const faces = context.scratchpad.controls.check_closest_face(m_coords,  coords, this.width, this.height);
+
                     if(faces) {
                         console.log(faces);
                         if(faces.coord[0] > 1) { 
@@ -91,16 +97,15 @@ export class Project extends Scene {
                         }
                     }
 
-                    if (faces != undefined) {
-                        context.scratchpad.controls.freeze_camera();
-                    }
+
+                    //if (faces === undefined)
+                    //    context.scratchpad.controls.freeze_camera();
                 }
             );
             context.canvas.addEventListener("mouseup", e => {
-                    context.scratchpad.controls.unfreeze_camera();
                     e.preventDefault()
-                    ray  = context.scratchpad.controls.get_mouse_ray(context.canvas);
-                    coords = context.scratchpad.controls.world_position();
+                    console.log("unfreeze");
+                    //context.scratchpad.controls.unfreeze_camera();
                 }
             );
         }

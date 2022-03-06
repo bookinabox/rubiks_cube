@@ -925,7 +925,7 @@ const Movement_Controls = defs.Movement_Controls =
                 this.matrix().set(Mat4.inverse(this.inverse()));
             }, "#8B8885");
             this.key_triggered_button("from left", ["4"], () => {
-                this.inverse().set(Mat4.look_at(vec3(-10, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0)));
+                this.inverse().set(Mat4.look_at(vec3(-25, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0)));
                 this.matrix().set(Mat4.inverse(this.inverse()));
             }, "#8B8885");
             this.new_line();
