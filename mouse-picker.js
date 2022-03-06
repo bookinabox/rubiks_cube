@@ -66,28 +66,32 @@ export class MousePicker extends defs.Movement_Controls{
 
         const cube_radius = 3;
 
-        // Find distance from cardinal planes
-        const z_axis = this.z_axis[0];
-        const z_orient = z_axis != 0 ? this.z_axis[0]/Math.abs(this.z_axis[0]) : 1;
-        const x_axis = this.z_axis[2];
-        const x_orient = x_axis != 0 ? this.z_axis[2]/Math.abs(this.z_axis[2]) : 1;
-        const y_axis = this.z_axis[1];
-        const y_orient = y_axis != 0 ? y_orient = this.z_axis[1]/Math.abs(this.z_axis[1]) : 1;
-
-        let front_dist = Math.abs((position[2] + cube_radius) / ray[2]) * -z_orient;
-        let back_dist = Math.abs((position[2] - cube_radius) / ray[2]) * -z_orient;
-        let right_dist = Math.abs((position[0] - cube_radius) / ray[0]) * -x_orient;
-        let left_dist = Math.abs((position[0] + cube_radius) / ray[0]) * -x_orient;
-        let top_dist = Math.abs((position[1] - cube_radius) / ray[1]) * -y_orient;
-        let bottom_dist = Math.abs((position[1] + cube_radius) / ray[1]) * -y_orient;
+        let front_dist = (position[2] + cube_radius) / ray[2];
+        let back_dist = (position[2] - cube_radius) / ray[2];
+        let right_dist = (position[0] - cube_radius) / ray[0];
+        let left_dist = (position[0] + cube_radius) / ray[0];
+        let top_dist = (position[1] - cube_radius) / ray[1];
+        let bottom_dist = (position[1] + cube_radius) / ray[1];
 
         // Do not take into account intersections with planes that are off the cube
-        const front_coord = ray.times(front_dist).plus(position);
-        const back_coord = ray.times(back_dist).plus(position);
-        const right_coord = ray.times(right_dist).plus(position);
-        const left_coord = ray.times(left_dist).plus(position);
-        const top_coord = ray.times(top_dist).plus(position);
-        const bottom_coord = ray.times(bottom_dist).plus(position);
+        const front_coord = ray.times(front_dist).plus(position)[2] === -3 ? ray.times(front_dist).plus(position) : ray.times(-front_dist).plus(position);
+        const back_coord = ray.times(back_dist).plus(position)[2] === 3 ? ray.times(front_dist).plus(position) : ray.times(-front_dist).plus(position);
+        const right_coord = ray.times(right_dist).plus(position)[0] === -3 ? ray.times(right_dist).plus(position) : ray.times(-right_dist).plus(position);
+        const left_coord = ray.times(left_dist).plus(position)[0] === 3 ? ray.times(left_dist).plus(position) : ray.times(-left_dist).plus(position);
+        const top_coord = ray.times(top_dist).plus(position)[1] === 3 ? ray.times(top_dist).plus(position) : ray.times(-top_dist).plus(position);;
+        const bottom_coord = ray.times(bottom_dist).plus(position)[1] === -3 ? ray.times(bottom_dist).plus(position) : ray.times(-bottom_dist).plus(position);
+
+        console.log("front_dist " + front_dist);
+        console.log("back_dist " + back_dist);
+        console.log("right_dist " + right_dist);
+        console.log("left_dist " + left_dist);
+        console.log("top_dist " + top_dist);
+        console.log("bottom_dist " + bottom_dist);
+        console.log("ray " + ray);
+        console.log("position " + position);
+        console.log();
+
+
 
         console.log("front")
         console.log(front_coord);
@@ -101,7 +105,6 @@ export class MousePicker extends defs.Movement_Controls{
         console.log(top_coord);
         console.log("bottom")
         console.log(bottom_coord);
-             
 
         const threshold = 3.0;
         if(Math.abs(front_coord[0]) > threshold || Math.abs(front_coord[1]) > threshold || Math.abs(front_coord[2]) > threshold) {
