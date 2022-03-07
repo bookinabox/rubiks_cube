@@ -77,7 +77,6 @@ export class Project extends Scene {
                 Math.PI / 4, context.width / context.height, 1, 100);
 
             this.children.push(context.scratchpad.controls = new MousePicker(program_state));
-
             context.canvas.addEventListener("mousedown", e => {
                 e.preventDefault()
                 const mouse_position = (e, rect = context.canvas.getBoundingClientRect()) => {

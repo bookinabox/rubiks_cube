@@ -892,6 +892,7 @@ const Movement_Controls = defs.Movement_Controls =
 
             //const speed_controls = this.control_panel.appendChild(document.createElement("span"));
             //speed_controls.style.margin = "30px";
+
             //this.key_triggered_button("-", ["o"], () =>
             //    this.speed_multiplier /= 1.2, undefined, undefined, undefined, speed_controls);
             //this.live_string(box => {
