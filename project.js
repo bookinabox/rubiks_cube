@@ -1,34 +1,37 @@
-import {defs, tiny} from './examples/common.js';
-import { Main_Scene } from './main-scene.js';
-import {MousePicker} from './mouse-picker.js';
+import { defs, tiny } from './examples/common.js';
+import { MousePicker } from './mouse-picker.js';
 const {
-    Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
+    vec, vec3, vec4, color, hex_color, Mat4, Light, Material, Scene,
 } = tiny;
 
 export class Project extends Scene {
-    
+
     constructor() {
         super();
 
         this.shapes = {
             cubelet: new defs.Cube(),
+            sphere: new defs.Subdivision_Sphere(4)
         }
 
         this.materials = {
             cubelet_mat: new Material(new Texture_Cube(), {
                 ambient: 1.0, color: hex_color("#000000")
             }),
+            background: new Material(new defs.Phong_Shader(), {
+                ambient: 1.0, diffuse: 1.0, specular: 1.0, color: hex_color("#222229")
+            })
         }
 
         this.cubelet_data = []
 
         // Initialize Cubes
-        for(let i=-1;i<2; i++) {
-            for(let j=-1; j<2; j++) {
-                for(let k=-1; k<2; k++) {
+        for (let i = -1; i < 2; i++) {
+            for (let j = -1; j < 2; j++) {
+                for (let k = -1; k < 2; k++) {
                     // don't render center
-                    if((i | j | k))
-                        this.cubelet_data.push(Mat4.translation(i*2, j*2, k*2));
+                    if ((i | j | k))
+                        this.cubelet_data.push(Mat4.translation(i * 2, j * 2, k * 2));
                 }
             }
         }
@@ -41,27 +44,27 @@ export class Project extends Scene {
         this.key_triggered_button("Cube rotation", ["v"], () => this.rotate_top());
     }
 
-    
+
     rotate_side() {
         let side = 1
-        for(let index in this.cubelet_data) {
-            if(Math.abs(this.cubelet_data[index][0][3] -2) < 0.0001) {
+        for (let index in this.cubelet_data) {
+            if (Math.abs(this.cubelet_data[index][0][3] - 2) < 0.0001) {
                 let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
-               
+
                 //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.rotation(Math.PI/2, 1, 0, 0));
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
                 //this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
             }
         }
     }
 
-     rotate_top() {
+    rotate_top() {
         let side = 1
-        for(let index in this.cubelet_data) {
-            if(Math.abs(this.cubelet_data[index][1][3] - 2) < 0.0001) {
+        for (let index in this.cubelet_data) {
+            if (Math.abs(this.cubelet_data[index][1][3] - 2) < 0.0001) {
                 //let translate_to_center = Mat4.translation(0, -this.cubelet_data[index][1][3], -this.cubelet_data[index][2][3]);
                 //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.rotation(Math.PI/2, 0, 1, 0));
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.rotation(Math.PI / 2, 0, 1, 0));
                 //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
             }
         }
@@ -76,51 +79,41 @@ export class Project extends Scene {
             this.children.push(context.scratchpad.controls = new MousePicker(program_state));
 
             context.canvas.addEventListener("mousedown", e => {
-                    e.preventDefault()
-                    context.scratchpad.controls.unfreeze_camera();
-                    const mouse_position = (e, rect = context.canvas.getBoundingClientRect()) => {
-                        this.width = rect.width;
-                        this.height = rect.height;
-                        return vec(e.clientX - (rect.left + rect.right) / 2, e.clientY - (rect.bottom + rect.top) / 2);
-                    }
-
-                    context.scratchpad.controls.update_view(program_state);
-                    context.scratchpad.controls.update_context(context)
-                    const coords = context.scratchpad.controls.world_position();
-                    const m_coords = mouse_position(e);
-                    const faces = context.scratchpad.controls.check_closest_face(m_coords,  coords, this.width, this.height);
-
-                    if(faces) {
-                        console.log(faces);
-                        if(faces.coord[0] > 1) { 
-                           this.rotate_side()
-                        }
-                    }
-
-
-                    //if (faces === undefined)
-                    //    context.scratchpad.controls.freeze_camera();
+                e.preventDefault()
+                const mouse_position = (e, rect = context.canvas.getBoundingClientRect()) => {
+                    this.width = rect.width;
+                    this.height = rect.height;
+                    return vec(e.clientX - (rect.left + rect.right) / 2, e.clientY - (rect.bottom + rect.top) / 2);
                 }
+
+                context.scratchpad.controls.update_view(program_state);
+                context.scratchpad.controls.update_context(context)
+                const coords = context.scratchpad.controls.world_position();
+                const m_coords = mouse_position(e);
+                const faces = context.scratchpad.controls.check_closest_face(m_coords, coords, this.width, this.height);
+
+                if (faces && faces.coord[0] > 1) {
+                    this.rotate_side()
+                    context.scratchpad.controls.freeze_camera();
+                }
+            }
             );
             context.canvas.addEventListener("mouseup", e => {
-                    e.preventDefault()
-                    console.log("unfreeze");
-                    //context.scratchpad.controls.unfreeze_camera();
-                }
+                e.preventDefault()
+                context.scratchpad.controls.unfreeze_camera();
+            }
             );
         }
-        
-
-        
 
         const light_position = vec4(10, 10, 10, 1);
         program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
 
         let t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
 
-        for(let transform_data in this.cubelet_data) {
+        for (let transform_data in this.cubelet_data) {
             this.shapes.cubelet.draw(context, program_state, this.cubelet_data[transform_data], this.materials.cubelet_mat);
         }
+        this.shapes.sphere.draw(context, program_state, Mat4.scale(50, 50, 50), this.materials.background);
     }
 }
 
