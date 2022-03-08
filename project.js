@@ -6,16 +6,20 @@ const {
 
 // Rotation Matrices (To avoid floating point issues)
 
-let R_X = new Mat4([1, 0, 0, 0],
-            [0, 0, -1, 0],
-            [0, 1, 0, 0],
-            [0, 0, 0, 1])
+let R_X = new Mat4( [1, 0, 0, 0],
+                    [0, 0, -1, 0],
+                    [0, 1, 0, 0],
+                    [0, 0, 0, 1])
 
+let R_y = new Mat4( [0, 0, 1, 0],
+                    [0, 1, 0, 0],
+                    [-1, 0, 0, 0],
+                    [0, 0, 0, 1])
 
-
-
-
-
+let R_z = new Mat4( [0, -1, 0, 0],
+                    [1, 0, 0, 0],
+                    [0, 1, 0, 0],
+                    [0, 0, 0, 1])
 
 export class Project extends Scene {
 
@@ -32,7 +36,7 @@ export class Project extends Scene {
                 ambient: 1.0, color: hex_color("#000000")
             }),
             background: new Material(new defs.Phong_Shader(), {
-                ambient: 1.0, diffuse: 1.0, specular: 1.0, color: hex_color("#222229")
+                ambient: 0.8, diffuse: 1.0, specular: 1.0, color: hex_color("#22232a")
             })
         }
 
@@ -75,11 +79,11 @@ export class Project extends Scene {
         let side = 1
         for (let index in this.cubelet_data) {
             if (Math.abs(this.cubelet_data[index][1][3] - 2) < 0.0001) {
-                //let translate_to_center = Mat4.translation(0, -this.cubelet_data[index][1][3], -this.cubelet_data[index][2][3]);
-                //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
                 
-                this.cubelet_data[index] = this.cubelet_data[index].times(R_X);
-                //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);  
+                this.cubelet_data[index] = R_y.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
             }
         }
     }
