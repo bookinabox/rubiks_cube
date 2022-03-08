@@ -4,6 +4,19 @@ const {
     vec, vec3, vec4, color, hex_color, Mat4, Light, Material, Scene,
 } = tiny;
 
+// Rotation Matrices (To avoid floating point issues)
+
+let R_X = new Mat4([1, 0, 0, 0],
+            [0, 0, -1, 0],
+            [0, 1, 0, 0],
+            [0, 0, 0, 1])
+
+
+
+
+
+
+
 export class Project extends Scene {
 
     constructor() {
@@ -51,9 +64,9 @@ export class Project extends Scene {
             if (Math.abs(this.cubelet_data[index][0][3] - 2) < 0.0001) {
                 let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
 
-                //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
-                //this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
+                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                this.cubelet_data[index] = R_X.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
             }
         }
     }
@@ -64,7 +77,8 @@ export class Project extends Scene {
             if (Math.abs(this.cubelet_data[index][1][3] - 2) < 0.0001) {
                 //let translate_to_center = Mat4.translation(0, -this.cubelet_data[index][1][3], -this.cubelet_data[index][2][3]);
                 //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.rotation(Math.PI / 2, 0, 1, 0));
+                
+                this.cubelet_data[index] = this.cubelet_data[index].times(R_X);
                 //this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
             }
         }
