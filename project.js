@@ -4,6 +4,24 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
 
+class Axis extends Shape {
+    constructor() {
+        super("position", "color");
+        this.arrays.position = Vector3.cast(
+            [0, 0, 0], [5, 0, 0],
+            [0, 0, 0], [0, 5, 0],
+            [0, 0, 0], [0, 0, 5]
+        );
+        this.arrays.color = [
+            vec4(1, 1, 1, 1), vec4(1, 1, 1, 1),
+            vec4(1, 1, 1, 1), vec4(1, 1, 1, 1),
+            vec4(1, 1, 1, 1), vec4(1, 1, 1, 1),
+        ];
+        this.indices = false; // not necessary
+    }
+}
+
+
 export class Project extends Scene {
     
     constructor() {
@@ -11,6 +29,7 @@ export class Project extends Scene {
 
         this.shapes = {
             cubelet: new defs.Cube(),
+            axis: new Axis(),
         }
 
         this.materials = {
@@ -38,6 +57,11 @@ export class Project extends Scene {
     make_control_panel() {
         this.key_triggered_button("Cube rotation", ["c"], () => this.rotate_side());
         this.key_triggered_button("Cube rotation", ["v"], () => this.rotate_top());
+        this.key_triggered_button("Cube rotation", ["a"], () => this.rotate_test());
+    }
+
+    rotate_test() {
+        console.log('roto roto');
     }
 
     
@@ -82,11 +106,14 @@ export class Project extends Scene {
                 }
             );
         }
-        
+
+        let model_transform = Mat4.identity();
+
+        //this.shapes.axis.draw(context, program_state, model_transform, this.white, "LINES");
 
 
 
-
+        //this.cubelet_data[2] = this.cubelet_data[2].times(Mat4.rotation(Math.PI/2, 1, 0, 0));
 
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, 1, 100);
@@ -97,7 +124,11 @@ export class Project extends Scene {
         let t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
 
         for(let transform_data in this.cubelet_data) {
-            this.shapes.cubelet.draw(context, program_state, this.cubelet_data[transform_data], this.materials.cubelet_mat);
+            // corners
+            if (transform_data in [0, 2, 4, 6, 8]) {
+                this.shapes.cubelet.draw(context, program_state, this.cubelet_data[transform_data], this.materials.cubelet_mat);
+
+            }
         }
     }
 }
