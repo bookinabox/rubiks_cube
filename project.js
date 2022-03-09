@@ -6,20 +6,20 @@ const {
 
 // Rotation Matrices (To avoid floating point issues)
 
-let R_x = new Mat4( [1, 0, 0, 0],
-                    [0, 0, -1, 0],
-                    [0, 1, 0, 0],
-                    [0, 0, 0, 1])
+let R_X = new Mat4([1, 0, 0, 0],
+    [0, 0, -1, 0],
+    [0, 1, 0, 0],
+    [0, 0, 0, 1])
 
-let R_y = new Mat4( [0, 0, 1, 0],
-                    [0, 1, 0, 0],
-                    [-1, 0, 0, 0],
-                    [0, 0, 0, 1])
+let R_Y = new Mat4([0, 0, 1, 0],
+    [0, 1, 0, 0],
+    [-1, 0, 0, 0],
+    [0, 0, 0, 1])
 
-let R_z = new Mat4( [0, -1, 0, 0],
-                    [1, 0, 0, 0],
-                    [0, 0, 1, 0],
-                    [0, 0, 0, 1])
+let R_Z = new Mat4([0, -1, 0, 0],
+    [1, 0, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1])
 
 export class Project extends Scene {
 
@@ -56,131 +56,46 @@ export class Project extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
+    /*
     make_control_panel() {
-        this.key_triggered_button("Rotate Right Side", ["r"], () => this.rotate_right_side());
-        this.key_triggered_button("Rotate Middle Vertically", ["v"], () => this.rotate_middle_vertically());
+        this.key_triggered_button("Rotate Right Side", ["r"], () => this.rotate("right", -1));
         this.key_triggered_button("Rotate Left Side", ["l"], () => this.rotate_left_side());
         this.key_triggered_button("Rotate Top", ["t"], () => this.rotate_top());
-        this.key_triggered_button("Rotate Middle Horizontally", ["h"], () => this.rotate_middle_horizontally());
         this.key_triggered_button("Rotate Bottom", ["b"], () => this.rotate_bottom());
         this.key_triggered_button("Rotate Front", ["f"], () => this.rotate_front());
-        this.key_triggered_button("Rotate Middle Depthwise", ["d"], () => this.rotate_middle_depthwise());
         this.key_triggered_button("Rotate Back", ["k"], () => this.rotate_back());
     }
+    */
 
 
-    rotate_right_side() {
-        let side = 1
+    rotate(side, direction) {
+        let coord = undefined;
+        let dir = direction > 0 ? 1 : -1;
+        let rot_matrix = undefined;
+        if (side == "right" || side == "left") {
+            coord = 0;
+            rot_matrix = R_X;
+        } else if (side == "top" || side == "bottom") {
+            coord = 1;
+            rot_matrix = R_Y;
+        } else if (side == "front" || side == "back") {
+            coord = 2;
+            rot_matrix = R_Z;
+        }
+
+        let opposite = -1;
+        if (side == "left" || side == "bottom" || side == "back") {
+            opposite = 1;
+        }
+
+        rot_matrix = dir == -1 ? Mat4.inverse(rot_matrix) : rot_matrix;
+
         for (let index in this.cubelet_data) {
-            if (Math.abs(this.cubelet_data[index][0][3] - 2) < 0.0001) {
-                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
+            if (Math.abs(this.cubelet_data[index][coord][3] + 2 * opposite) < 0.0001) {
+                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][(coord + 1) % 2][3]), Math.round(-this.cubelet_data[index][(coord + 2) % 2][3]));
 
                 this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = R_x.times(this.cubelet_data[index]);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
-            }
-        }
-    }
-
-    rotate_middle_vertically() {
-        let side = 1
-        for (let index in this.cubelet_data) {
-            if (Math.abs(this.cubelet_data[index][0][3] - 0) < 0.0001) {
-                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
-
-                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = R_x.times(this.cubelet_data[index]);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
-            }
-        }
-    }
-
-    rotate_left_side() {
-        let side = 1
-        for (let index in this.cubelet_data) {
-            if (Math.abs(this.cubelet_data[index][0][3] + 2) < 0.0001) {
-                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
-
-                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = R_x.times(this.cubelet_data[index]);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
-            }
-        }
-    }
-
-    rotate_top() {
-        let side = 1
-        for (let index in this.cubelet_data) {
-            if (Math.abs(this.cubelet_data[index][1][3] - 2) < 0.0001) {
-                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
-                
-                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);  
-                this.cubelet_data[index] = R_y.times(this.cubelet_data[index]);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
-            }
-        }
-    }
-
-    rotate_middle_horizontally() {
-        let side = 1
-        for (let index in this.cubelet_data) {
-            if (Math.abs(this.cubelet_data[index][1][3] - 0) < 0.0001) {
-                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
-                
-                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);  
-                this.cubelet_data[index] = R_y.times(this.cubelet_data[index]);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
-            }
-        }
-    }
-
-    rotate_bottom() {
-        let side = 1
-        for (let index in this.cubelet_data) {
-            if (Math.abs(this.cubelet_data[index][1][3] + 2) < 0.0001) {
-                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
-                
-                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);  
-                this.cubelet_data[index] = R_y.times(this.cubelet_data[index]);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
-            }
-        }
-    }
-
-    rotate_front() {
-        let side = 1
-        for (let index in this.cubelet_data) {
-            if (Math.abs(this.cubelet_data[index][2][3] - 2) < 0.0001) {
-                let translate_to_center = Mat4.translation(Math.round(-this.cubelet_data[index][0][3]), Math.round(-this.cubelet_data[index][1][3]), 0);
-                
-                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = R_z.times(this.cubelet_data[index]);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
-            }
-        }
-    }
-
-    rotate_middle_depthwise() {
-        let side = 1
-        for (let index in this.cubelet_data) {
-            if (Math.abs(this.cubelet_data[index][2][3] - 0) < 0.0001) {
-                let translate_to_center = Mat4.translation(Math.round(-this.cubelet_data[index][0][3]), Math.round(-this.cubelet_data[index][1][3]), 0);
-                
-                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = R_z.times(this.cubelet_data[index]);
-                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
-            }
-        }
-    }
-
-    rotate_back() {
-        let side = 1
-        for (let index in this.cubelet_data) {
-            if (Math.abs(this.cubelet_data[index][2][3] + 2) < 0.0001) {
-                let translate_to_center = Mat4.translation(Math.round(-this.cubelet_data[index][0][3]), Math.round(-this.cubelet_data[index][1][3]), 0);
-                
-                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = R_z.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = rot_matrix.times(this.cubelet_data[index]);
                 this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
             }
         }
@@ -193,6 +108,8 @@ export class Project extends Scene {
                 Math.PI / 4, context.width / context.height, 1, 100);
 
             this.children.push(context.scratchpad.controls = new MousePicker(program_state));
+            let selected = undefined;
+            let ray_1 = undefined;
             context.canvas.addEventListener("mousedown", e => {
                 e.preventDefault()
                 const mouse_position = (e, rect = context.canvas.getBoundingClientRect()) => {
@@ -205,16 +122,80 @@ export class Project extends Scene {
                 context.scratchpad.controls.update_context(context)
                 const coords = context.scratchpad.controls.world_position();
                 const m_coords = mouse_position(e);
-                const faces = context.scratchpad.controls.check_closest_face(m_coords, coords, this.width, this.height);
+                ray_1 = context.scratchpad.controls.get_mouse_ray(m_coords, this.width, this.height);
+                selected = context.scratchpad.controls.check_closest_face(m_coords, coords, this.width, this.height);
 
-                if (faces && faces.coord[0] > 1) {
-                    this.rotate_side()
+                if (selected) {
                     context.scratchpad.controls.freeze_camera();
                 }
             }
             );
+
+            let ray_2 = undefined;
             context.canvas.addEventListener("mouseup", e => {
                 e.preventDefault()
+
+                if (selected) {
+
+                    const mouse_position = (e, rect = context.canvas.getBoundingClientRect()) => {
+                        this.width = rect.width;
+                        this.height = rect.height;
+                        return vec(e.clientX - (rect.left + rect.right) / 2, e.clientY - (rect.bottom + rect.top) / 2);
+                    }
+
+                    context.scratchpad.controls.update_view(program_state);
+                    context.scratchpad.controls.update_context(context)
+                    const m_coords = mouse_position(e);
+                    ray_2 = context.scratchpad.controls.get_mouse_ray(m_coords, this.width, this.height);
+
+                    const dir_x = -ray_2[0] + ray_1[0];
+                    const dir_y = -ray_2[1] + ray_1[1];
+                    const dir_z = -ray_2[2] + ray_1[2];
+
+                    // Need to only look at largest delta
+
+
+                    let flip_rotation = 1
+                    if (selected.name === "back") {
+                        flip_rotation = -1
+                    }                   
+
+
+
+                    if (selected.name === "front" || selected.name === "back") {
+                        if (selected.coord[0] > 1 && dir_y > 0) {
+                            this.rotate("right", -1 * flip_rotation);
+                        } else if (selected.coord[0] > 1 && dir_y < 0) {
+                            this.rotate("right", 1 * flip_rotation);
+                        }
+
+                        else if (selected.coord[0] < -1 && dir_y > 0) {
+                            this.rotate("left", -1 * flip_rotation);
+                        } else if (selected.coord[0] < -1 && dir_y < 0) {
+                            this.rotate("left", 1 * flip_rotation);
+                        }
+
+                        else if (selected.coord[1] < -1 && dir_x > 0) {
+                            this.rotate("top", -1 * flip_rotation);
+                        } else if (selected.coord[1] < -1 && dir_x < 0) {
+                            this.rotate("top", 1 * flip_rotation);
+                        }
+
+                        else if (selected.coord[1] > 1 && dir_x > 0) {
+                            this.rotate("bottom", -1 * flip_rotation);
+                        } else if (selected.coord[1] > 1 && dir_x < 0) {
+                            this.rotate("bottom", 1 * flip_rotation);
+                        }
+                    } else if (selected.name === "left") {
+
+                    } else if (selected.name === "right") {
+
+                    } else if (selected.name === "top") {
+
+                    } else if (selected.name === "bottom") {
+
+                    }
+                }
                 context.scratchpad.controls.unfreeze_camera();
             }
             );

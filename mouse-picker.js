@@ -33,6 +33,8 @@ export class MousePicker extends defs.Movement_Controls {
         // Convert from left to right handed coordinate
         this.ray = Mat4.scale(1, 1, -1).times(this.ray);
         this.ray = vec(this.ray[0], this.ray[1], this.ray[2]).normalized();
+
+        return this.ray;
     }
 
     freeze_camera() {
