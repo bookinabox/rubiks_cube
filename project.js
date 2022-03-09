@@ -56,6 +56,7 @@ export class Project extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
+    // Going to grey this out for now because I got rid of the functions
     /*
     make_control_panel() {
         this.key_triggered_button("Rotate Right Side", ["r"], () => this.rotate("right", -1));
@@ -67,11 +68,13 @@ export class Project extends Scene {
     }
     */
 
-
+    // Allows a single rotation for all sides
     rotate(side, direction) {
         let coord = undefined;
         let dir = direction > 0 ? 1 : -1;
         let rot_matrix = undefined;
+
+        // Coord = 0 means look at x, etc.
         if (side == "right" || side == "left") {
             coord = 0;
             rot_matrix = R_X;
@@ -83,13 +86,17 @@ export class Project extends Scene {
             rot_matrix = R_Z;
         }
 
+        // To simplify which side we're looking at
+        // i.e. -2 for right side, 2 for left side
         let opposite = -1;
         if (side == "left" || side == "bottom" || side == "back") {
             opposite = 1;
         }
 
+        // Based on direction, we can basically just rotate on way or another
         rot_matrix = dir == -1 ? Mat4.inverse(rot_matrix) : rot_matrix;
 
+        // This should handle all possible side rotations (not center ones)
         for (let index in this.cubelet_data) {
             if (Math.abs(this.cubelet_data[index][coord][3] + 2 * opposite) < 0.0001) {
                 let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][(coord + 1) % 2][3]), Math.round(-this.cubelet_data[index][(coord + 2) % 2][3]));
