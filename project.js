@@ -6,7 +6,7 @@ const {
 
 // Rotation Matrices (To avoid floating point issues)
 
-let R_X = new Mat4( [1, 0, 0, 0],
+let R_x = new Mat4( [1, 0, 0, 0],
                     [0, 0, -1, 0],
                     [0, 1, 0, 0],
                     [0, 0, 0, 1])
@@ -18,7 +18,7 @@ let R_y = new Mat4( [0, 0, 1, 0],
 
 let R_z = new Mat4( [0, -1, 0, 0],
                     [1, 0, 0, 0],
-                    [0, 1, 0, 0],
+                    [0, 0, 1, 0],
                     [0, 0, 0, 1])
 
 export class Project extends Scene {
@@ -57,19 +57,52 @@ export class Project extends Scene {
     }
 
     make_control_panel() {
-        this.key_triggered_button("Cube rotation", ["c"], () => this.rotate_side());
-        this.key_triggered_button("Cube rotation", ["v"], () => this.rotate_top());
+        this.key_triggered_button("Rotate Right Side", ["r"], () => this.rotate_right_side());
+        this.key_triggered_button("Rotate Middle Vertically", ["v"], () => this.rotate_middle_vertically());
+        this.key_triggered_button("Rotate Left Side", ["l"], () => this.rotate_left_side());
+        this.key_triggered_button("Rotate Top", ["t"], () => this.rotate_top());
+        this.key_triggered_button("Rotate Middle Horizontally", ["h"], () => this.rotate_middle_horizontally());
+        this.key_triggered_button("Rotate Bottom", ["b"], () => this.rotate_bottom());
+        this.key_triggered_button("Rotate Front", ["f"], () => this.rotate_front());
+        this.key_triggered_button("Rotate Middle Depthwise", ["d"], () => this.rotate_middle_depthwise());
+        this.key_triggered_button("Rotate Back", ["k"], () => this.rotate_back());
     }
 
 
-    rotate_side() {
+    rotate_right_side() {
         let side = 1
         for (let index in this.cubelet_data) {
             if (Math.abs(this.cubelet_data[index][0][3] - 2) < 0.0001) {
                 let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
 
                 this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
-                this.cubelet_data[index] = R_X.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = R_x.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
+            }
+        }
+    }
+
+    rotate_middle_vertically() {
+        let side = 1
+        for (let index in this.cubelet_data) {
+            if (Math.abs(this.cubelet_data[index][0][3] - 0) < 0.0001) {
+                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
+
+                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                this.cubelet_data[index] = R_x.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
+            }
+        }
+    }
+
+    rotate_left_side() {
+        let side = 1
+        for (let index in this.cubelet_data) {
+            if (Math.abs(this.cubelet_data[index][0][3] + 2) < 0.0001) {
+                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
+
+                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                this.cubelet_data[index] = R_x.times(this.cubelet_data[index]);
                 this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
             }
         }
@@ -83,6 +116,71 @@ export class Project extends Scene {
                 
                 this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);  
                 this.cubelet_data[index] = R_y.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
+            }
+        }
+    }
+
+    rotate_middle_horizontally() {
+        let side = 1
+        for (let index in this.cubelet_data) {
+            if (Math.abs(this.cubelet_data[index][1][3] - 0) < 0.0001) {
+                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
+                
+                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);  
+                this.cubelet_data[index] = R_y.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
+            }
+        }
+    }
+
+    rotate_bottom() {
+        let side = 1
+        for (let index in this.cubelet_data) {
+            if (Math.abs(this.cubelet_data[index][1][3] + 2) < 0.0001) {
+                let translate_to_center = Mat4.translation(0, Math.round(-this.cubelet_data[index][1][3]), Math.round(-this.cubelet_data[index][2][3]));
+                
+                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);  
+                this.cubelet_data[index] = R_y.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
+            }
+        }
+    }
+
+    rotate_front() {
+        let side = 1
+        for (let index in this.cubelet_data) {
+            if (Math.abs(this.cubelet_data[index][2][3] - 2) < 0.0001) {
+                let translate_to_center = Mat4.translation(Math.round(-this.cubelet_data[index][0][3]), Math.round(-this.cubelet_data[index][1][3]), 0);
+                
+                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                this.cubelet_data[index] = R_z.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
+            }
+        }
+    }
+
+    rotate_middle_depthwise() {
+        let side = 1
+        for (let index in this.cubelet_data) {
+            if (Math.abs(this.cubelet_data[index][2][3] - 0) < 0.0001) {
+                let translate_to_center = Mat4.translation(Math.round(-this.cubelet_data[index][0][3]), Math.round(-this.cubelet_data[index][1][3]), 0);
+                
+                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                this.cubelet_data[index] = R_z.times(this.cubelet_data[index]);
+                this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
+            }
+        }
+    }
+
+    rotate_back() {
+        let side = 1
+        for (let index in this.cubelet_data) {
+            if (Math.abs(this.cubelet_data[index][2][3] + 2) < 0.0001) {
+                let translate_to_center = Mat4.translation(Math.round(-this.cubelet_data[index][0][3]), Math.round(-this.cubelet_data[index][1][3]), 0);
+                
+                this.cubelet_data[index] = this.cubelet_data[index].times(translate_to_center);
+                this.cubelet_data[index] = R_z.times(this.cubelet_data[index]);
                 this.cubelet_data[index] = this.cubelet_data[index].times(Mat4.inverse(translate_to_center));
             }
         }
