@@ -144,55 +144,65 @@ export class Project extends Scene {
                     }
 
                     context.scratchpad.controls.update_view(program_state);
-                    context.scratchpad.controls.update_context(context)
+                    context.scratchpad.controls.update_context(context);
                     const m_coords = mouse_position(e);
                     ray_2 = context.scratchpad.controls.get_mouse_ray(m_coords, this.width, this.height);
 
-                    const dir_x = -ray_2[0] + ray_1[0];
-                    const dir_y = -ray_2[1] + ray_1[1];
-                    const dir_z = -ray_2[2] + ray_1[2];
+                    const dir_x = ray_1[0] - ray_2[0];
+                    const dir_y = ray_1[1] - ray_2[1];
+                    const dir_z = ray_1[2] - ray_2[2];
 
-                    // Need to only look at largest delta
+                    // Need to only look at largest change in mouse position.
+                    // (so we don't rotate the wrong direction just because its the first if statement)
+                    let max_diff = undefined;
+                    if (Math.abs(dir_x) > Math.abs(dir_y) && Math.abs(dir_x) > Math.abs(dir_z)) {
+                        max_diff = "x";
+                    } else if (Math.abs(dir_y) > Math.abs(dir_z) && Math.abs(dir_y) > Math.abs(dir_x)) {
+                        max_diff = "y";
+                    } else {
+                        max_diff = "z";
+                    }
 
+                    // Basically doing this because if we look from opposite side,
+                    // its exactly the same as inverting all the rotations
+                    let flip_rotation = 1;
 
-                    let flip_rotation = 1
+                    // TODO: Expand to the other sides. Just check which side it should be experimentally
                     if (selected.name === "back") {
-                        flip_rotation = -1
-                    }                   
-
-
+                        flip_rotation = -1;
+                    }
 
                     if (selected.name === "front" || selected.name === "back") {
-                        if (selected.coord[0] > 1 && dir_y > 0) {
-                            this.rotate("right", -1 * flip_rotation);
-                        } else if (selected.coord[0] > 1 && dir_y < 0) {
-                            this.rotate("right", 1 * flip_rotation);
+                        if (max_diff === "y") {
+                            if (selected.coord[0] > 1 && dir_y > 0) {
+                                this.rotate("right", -1 * flip_rotation);
+                            } else if (selected.coord[0] > 1 && dir_y < 0) {
+                                this.rotate("right", 1 * flip_rotation);
+                            }
+
+                            else if (selected.coord[0] < -1 && dir_y > 0) {
+                                this.rotate("left", -1 * flip_rotation);
+                            } else if (selected.coord[0] < -1 && dir_y < 0) {
+                                this.rotate("left", 1 * flip_rotation);
+                            }
+                        }
+                        if (max_diff === "x") {
+                            if (selected.coord[1] < -1 && dir_x > 0) {
+                                this.rotate("top", -1 * flip_rotation);
+                            } else if (selected.coord[1] < -1 && dir_x < 0) {
+                                this.rotate("top", 1 * flip_rotation);
+                            }
+
+                            else if (selected.coord[1] > 1 && dir_x > 0) {
+                                this.rotate("bottom", -1 * flip_rotation);
+                            } else if (selected.coord[1] > 1 && dir_x < 0) {
+                                this.rotate("bottom", 1 * flip_rotation);
+                            }
                         }
 
-                        else if (selected.coord[0] < -1 && dir_y > 0) {
-                            this.rotate("left", -1 * flip_rotation);
-                        } else if (selected.coord[0] < -1 && dir_y < 0) {
-                            this.rotate("left", 1 * flip_rotation);
-                        }
+                    } else if (selected.name === "left" || selected.name === "right") {
 
-                        else if (selected.coord[1] < -1 && dir_x > 0) {
-                            this.rotate("top", -1 * flip_rotation);
-                        } else if (selected.coord[1] < -1 && dir_x < 0) {
-                            this.rotate("top", 1 * flip_rotation);
-                        }
-
-                        else if (selected.coord[1] > 1 && dir_x > 0) {
-                            this.rotate("bottom", -1 * flip_rotation);
-                        } else if (selected.coord[1] > 1 && dir_x < 0) {
-                            this.rotate("bottom", 1 * flip_rotation);
-                        }
-                    } else if (selected.name === "left") {
-
-                    } else if (selected.name === "right") {
-
-                    } else if (selected.name === "top") {
-
-                    } else if (selected.name === "bottom") {
+                    } else if (selected.name === "top" || selected.name === "bottom") {
 
                     }
                 }
@@ -203,8 +213,6 @@ export class Project extends Scene {
 
         const light_position = vec4(10, 10, 10, 1);
         program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
-
-        let t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
 
         for (let transform_data in this.cubelet_data) {
             this.shapes.cubelet.draw(context, program_state, this.cubelet_data[transform_data], this.materials.cubelet_mat);
