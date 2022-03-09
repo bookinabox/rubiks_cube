@@ -278,10 +278,10 @@ class Texture_Cube extends defs.Phong_Shader {
                     vec3 color = vec3(1.0,1.0,1.0);
 
                     if(f_position.x == -1.0) {
-                        color = vec3(0, 0, 1.0);
+                        color = vec3(0, 1.0, 0);
                     }
                     if(f_position.x == 1.0) {
-                        color = vec3(0, 1.0, 0);
+                        color = vec3(0, 0, 1.0);
                     }
 
 
