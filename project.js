@@ -56,6 +56,22 @@ export class Project extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
+
+    shuffle() {
+        let sides = ["right", "left", "top", "bottom", "front", "back"];
+
+        let side = sides[Math.floor(Math.random() * sides.length)];
+        let dir = 1;
+        if (Math.floor(Math.random() * 2) == 0) {
+            dir = dir * -1;
+        }
+        this.rotate(side, dir);
+        
+        
+
+        
+    }
+
     
     make_control_panel() {
         this.key_triggered_button("R", ["r"], () => this.rotate("right", -1));
@@ -75,6 +91,12 @@ export class Project extends Scene {
 
         this.key_triggered_button("B", ["b"], () => this.rotate("back", 1));
         this.key_triggered_button("B'", ["Shift", "B"], () => this.rotate("back", -1));
+
+        this.key_triggered_button("Shuffle", ["s"], () => {
+            for (let i = 0; i < 20; i++) {
+                this.shuffle();
+            }
+        });
 
     }
     
