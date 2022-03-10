@@ -56,17 +56,28 @@ export class Project extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
-    // Going to grey this out for now because I got rid of the functions
-    /*
+    
     make_control_panel() {
-        this.key_triggered_button("Rotate Right Side", ["r"], () => this.rotate("right", -1));
-        this.key_triggered_button("Rotate Left Side", ["l"], () => this.rotate_left_side());
-        this.key_triggered_button("Rotate Top", ["t"], () => this.rotate_top());
-        this.key_triggered_button("Rotate Bottom", ["b"], () => this.rotate_bottom());
-        this.key_triggered_button("Rotate Front", ["f"], () => this.rotate_front());
-        this.key_triggered_button("Rotate Back", ["k"], () => this.rotate_back());
+        this.key_triggered_button("R", ["r"], () => this.rotate("right", -1));
+        this.key_triggered_button("R'", ["Shift", "R"], () => this.rotate("right", 1));
+
+        this.key_triggered_button("L", ["l"], () => this.rotate("left", 1));
+        this.key_triggered_button("L'", ["Shift", "L"], () => this.rotate("left", -1));
+
+        this.key_triggered_button("U", ["u"], () => this.rotate("top", -1));
+        this.key_triggered_button("U'", ["Shift", "U"], () => this.rotate("top", 1));  
+
+        this.key_triggered_button("D", ["d"], () => this.rotate("bottom", 1));
+        this.key_triggered_button("D'", ["Shift", "D"], () => this.rotate("bottom", -1));  
+
+        this.key_triggered_button("F", ["f"], () => this.rotate("front", -1));
+        this.key_triggered_button("F'", ["Shift", "F"], () => this.rotate("front", 1));
+
+        this.key_triggered_button("B", ["b"], () => this.rotate("back", 1));
+        this.key_triggered_button("B'", ["Shift", "B"], () => this.rotate("back", -1));
+
     }
-    */
+    
 
     // Allows a single rotation for all sides
     rotate(side, direction) {
