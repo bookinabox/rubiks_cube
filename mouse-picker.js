@@ -33,7 +33,7 @@ export class MousePicker extends defs.Movement_Controls {
         // Convert from left to right handed coordinate
         this.ray = Mat4.scale(1, 1, -1).times(this.ray);
         this.ray = vec(this.ray[0], this.ray[1], this.ray[2]).normalized();
-
+        console.log(this.ray);
         return this.ray;
     }
 
@@ -55,7 +55,6 @@ export class MousePicker extends defs.Movement_Controls {
     check_closest_face(mouse_coords, position, width, height) {
         this.get_mouse_ray(mouse_coords, width, height);
         let ray = this.ray;
-
         const cube_radius = 3;
 
         let front_dist = (position[2] + cube_radius) / ray[2];

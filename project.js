@@ -4,7 +4,7 @@ const {
     vec, vec3, vec4, color, hex_color, Mat4, Light, Material, Scene,
 } = tiny;
 
-// Rotation Matrices (To avoid floating point issues)
+// Rotation Matrices (To avoid floating point issues caused by Math.PI/2)
 
 let R_X = new Mat4([1, 0, 0, 0],
     [0, 0, -1, 0],
@@ -175,7 +175,7 @@ export class Project extends Scene {
                     let flip_rotation = 1;
 
                     // TODO: Expand to the other sides. Just check which side it should be experimentally
-                    if (selected.name === "back") {
+                    if (selected.name === "back" || selected.name === "right" || selected.name === "bottom") {
                         flip_rotation = -1;
                     }
 
@@ -208,8 +208,60 @@ export class Project extends Scene {
                         }
 
                     } else if (selected.name === "left" || selected.name === "right") {
+                        if (max_diff === "y") {
+                            if (selected.coord[2] > 1 && dir_y > 0) {
+                                this.rotate("back", -1 * flip_rotation);
+                            } else if (selected.coord[2] > 1 && dir_y < 0) {
+                                this.rotate("back", 1 * flip_rotation);
+                            }
+
+                            else if (selected.coord[2] < -1 && dir_y > 0) {
+                                this.rotate("front", -1 * flip_rotation);
+                            } else if (selected.coord[2] < -1 && dir_y < 0) {
+                                this.rotate("front", 1 * flip_rotation);
+                            }
+                        }
+                        if (max_diff === "z") {
+                            if (selected.coord[1] < -1 && dir_z > 0) {
+                                this.rotate("top", 1 * flip_rotation);
+                            } else if (selected.coord[1] < -1 && dir_z < 0) {
+                                this.rotate("top", -1 * flip_rotation);
+                            }
+
+                            else if (selected.coord[1] > 1 && dir_z > 0) {
+                                this.rotate("bottom", 1 * flip_rotation);
+                            } else if (selected.coord[1] > 1 && dir_z < 0) {
+                                this.rotate("bottom", -1 * flip_rotation);
+                            }
+                        }
 
                     } else if (selected.name === "top" || selected.name === "bottom") {
+                        if (max_diff === "z") {
+                            if (selected.coord[0] < -1 && dir_z > 0) {
+                                this.rotate("left", -1 * flip_rotation);
+                            } else if (selected.coord[0] < -1 && dir_z < 0) {
+                                this.rotate("left", 1 * flip_rotation);
+                            }
+
+                            else if (selected.coord[0] > 1 && dir_z > 0) {
+                                this.rotate("right", -1 * flip_rotation);
+                            } else if (selected.coord[0] > 1 && dir_z < 0) {
+                                this.rotate("right", 1 * flip_rotation);
+                            }
+                        }
+                        if (max_diff === "x") {
+                            if (selected.coord[2] < -1 && dir_x > 0) {
+                                this.rotate("back", 1 * flip_rotation);
+                            } else if (selected.coord[2] < -1 && dir_x < 0) {
+                                this.rotate("back", -1 * flip_rotation);
+                            }
+
+                            else if (selected.coord[2] > 1 && dir_x > 0) {
+                                this.rotate("front", 1 * flip_rotation);
+                            } else if (selected.coord[2] > 1 && dir_x < 0) {
+                                this.rotate("front", -1 * flip_rotation);
+                            }
+                        }
 
                     }
                 }
