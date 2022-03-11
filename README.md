@@ -12,7 +12,9 @@ The code can be run like all other project codes by starting a server by running
 
 ## Contributors
 Derek Lee - Mouse picking, creating the cubes, texturing the cubes, implementing rotations.
-Vishal Narayan - Shuffling function, adding buttons, initial idea.
+
+Vishal Narayan - Shuffling function, adding rotation buttons, initial idea.
+
 Keshav Nambiar - Helping with rotation functions, debugging.
 
 ## Image Credits

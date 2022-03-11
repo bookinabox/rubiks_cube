@@ -4,7 +4,7 @@ const {
     vec, vec4, Mat4
 } = tiny;
 
-export class MousePicker extends defs.Movement_Controls {
+export class Controls extends defs.Movement_Controls {
     constructor(program_state) {
         super();
         this.projection_matrix = program_state.projection_transform;

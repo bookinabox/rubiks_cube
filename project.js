@@ -1,5 +1,5 @@
 import { defs, tiny } from './examples/common.js';
-import { MousePicker } from './mouse-picker.js';
+import { Controls } from './mouse-picker.js';
 const {
     vec, vec3, vec4, color, hex_color, Mat4, Light, Material, Scene,
 } = tiny;
@@ -21,7 +21,7 @@ let R_Z = new Mat4([0, -1, 0, 0],
     [0, 0, 1, 0],
     [0, 0, 0, 1])
 
-export class Project extends Scene {
+export class Rubiks_Cube extends Scene {
 
     constructor() {
         super();
@@ -83,7 +83,7 @@ export class Project extends Scene {
         }
     }
 
-    
+
     make_control_panel() {
         this.key_triggered_button("R", ["r"], () => this.rotate("right", -1));
         this.key_triggered_button("R'", ["Shift", "R"], () => this.rotate("right", 1));
@@ -92,10 +92,10 @@ export class Project extends Scene {
         this.key_triggered_button("L'", ["Shift", "L"], () => this.rotate("left", -1));
 
         this.key_triggered_button("U", ["u"], () => this.rotate("top", -1));
-        this.key_triggered_button("U'", ["Shift", "U"], () => this.rotate("top", 1));  
+        this.key_triggered_button("U'", ["Shift", "U"], () => this.rotate("top", 1));
 
         this.key_triggered_button("D", ["d"], () => this.rotate("bottom", 1));
-        this.key_triggered_button("D'", ["Shift", "D"], () => this.rotate("bottom", -1));  
+        this.key_triggered_button("D'", ["Shift", "D"], () => this.rotate("bottom", -1));
 
         this.key_triggered_button("F", ["f"], () => this.rotate("front", -1));
         this.key_triggered_button("F'", ["Shift", "F"], () => this.rotate("front", 1));
@@ -111,7 +111,7 @@ export class Project extends Scene {
         this.key_triggered_button("Solve", ["Shift", "S"], () => this.solve());
 
     }
-    
+
 
     // Allows a single rotation for all sides
     rotate(side, direction) {
@@ -159,7 +159,7 @@ export class Project extends Scene {
             program_state.projection_transform = Mat4.perspective(
                 Math.PI / 4, context.width / context.height, 1, 100);
 
-            this.children.push(context.scratchpad.controls = new MousePicker(program_state));
+            this.children.push(context.scratchpad.controls = new Controls(program_state));
             let selected = undefined;
             let ray_1 = undefined;
             context.canvas.addEventListener("mousedown", e => {
