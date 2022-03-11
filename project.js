@@ -66,10 +66,21 @@ export class Project extends Scene {
             dir = dir * -1;
         }
         this.rotate(side, dir);
-        
-        
+    }
 
-        
+    solve() {
+        this.cubelet_data = []
+
+        // Initialize Cubes
+        for (let i = -1; i < 2; i++) {
+            for (let j = -1; j < 2; j++) {
+                for (let k = -1; k < 2; k++) {
+                    // don't render center
+                    if ((i | j | k))
+                        this.cubelet_data.push(Mat4.translation(i * 2, j * 2, k * 2));
+                }
+            }
+        }
     }
 
     
@@ -97,6 +108,7 @@ export class Project extends Scene {
                 this.shuffle();
             }
         });
+        this.key_triggered_button("Solve", ["Shift", "S"], () => this.solve());
 
     }
     
