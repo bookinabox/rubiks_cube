@@ -137,7 +137,7 @@ export class MousePicker extends defs.Movement_Controls {
         });
 
 
-        // Determine which side(s) (up to two, cannot decide which until mouse lets go)
+        // Determine which side(s) 
         let coordinates = min.coord;
 
         if (min.coord != undefined) {

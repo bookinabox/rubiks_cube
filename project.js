@@ -218,8 +218,6 @@ export class Project extends Scene {
                     // Basically doing this because if we look from opposite side,
                     // its exactly the same as inverting all the rotations
                     let flip_rotation = 1;
-
-                    // TODO: Expand to the other sides. Just check which side it should be experimentally
                     if (selected.name === "back" || selected.name === "right" || selected.name === "bottom") {
                         flip_rotation = -1;
                     }
