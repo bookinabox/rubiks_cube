@@ -87,22 +87,22 @@ export class Rubiks_Cube extends Scene {
     make_control_panel() {
         this.key_triggered_button("R", ["r"], () => this.rotate("right", -1));
         this.key_triggered_button("R'", ["Shift", "R"], () => this.rotate("right", 1));
-
+        this.new_line()
         this.key_triggered_button("L", ["l"], () => this.rotate("left", 1));
         this.key_triggered_button("L'", ["Shift", "L"], () => this.rotate("left", -1));
-
+        this.new_line()
         this.key_triggered_button("U", ["u"], () => this.rotate("top", -1));
         this.key_triggered_button("U'", ["Shift", "U"], () => this.rotate("top", 1));
-
+        this.new_line()
         this.key_triggered_button("D", ["d"], () => this.rotate("bottom", 1));
         this.key_triggered_button("D'", ["Shift", "D"], () => this.rotate("bottom", -1));
-
+        this.new_line()
         this.key_triggered_button("F", ["f"], () => this.rotate("front", -1));
         this.key_triggered_button("F'", ["Shift", "F"], () => this.rotate("front", 1));
-
+        this.new_line()
         this.key_triggered_button("B", ["b"], () => this.rotate("back", 1));
         this.key_triggered_button("B'", ["Shift", "B"], () => this.rotate("back", -1));
-
+        this.new_line()
         this.key_triggered_button("Shuffle", ["s"], () => {
             for (let i = 0; i < 20; i++) {
                 this.shuffle();
